@@ -68,9 +68,9 @@ otherwise `import src` is not found.
 
 ## Step 3: look at the representation
 
-UMAP (`umap-learn`) maps the 768 values of each study to two, so all studies can be
-drawn as points; studies that are close in the representation end up close in the
-picture. PCA to 50 dimensions first makes it faster.
+UMAP (the `umap-learn` package, see its [documentation](https://umap-learn.readthedocs.io/en/latest/basic_usage.html))
+maps the 768 values of each study to two, so all studies can be drawn as points;
+studies that are close in the representation end up close in the picture.
 
 - `n_neighbors` decides how many neighbouring studies UMAP looks at when placing a
   point. Small values keep local detail and break the picture into islands; large
@@ -86,7 +86,10 @@ A linear probe is a logistic regression trained to predict one target from the
 representation. If it predicts well, the information is present.
 
 - Studies and labels: `binary_label` and `usable_findings`; drop missing labels.
-- Model: logistic regression, features standardised.
+- Model: logistic regression, features standardised. All model, split and score
+  functions named on this page (`LogisticRegression`, `StandardScaler`,
+  `StratifiedGroupKFold`, `GroupKFold`, `TfidfVectorizer`, `Pipeline`, `roc_auc_score`,
+  ...) come from scikit-learn.
 - **Evaluation must be patient-wise.** 2,524 patients have more than one study; if a
   patient appears in both the training and the test part, the probe can recognise the
   patient instead of the disease. Use `StratifiedGroupKFold`, 5 folds, `patient_id` as
@@ -127,8 +130,8 @@ step 4:
 ## Step 6: interpret
 
 What does the probe find that the UMAP picture does not show, or the other way round?
-Where do TF-IDF and BioClinicalBERT differ, and why? What could the presence of hospital
-information mean for a model built on this representation?
+Where do TF-IDF and BioClinicalBERT differ, and why? What could the presence of the
+metadata you found mean for a model built on this representation?
 
 ## Nice to have: one deeper look
 
