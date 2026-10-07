@@ -33,7 +33,6 @@ flowchart LR
     P --> Q["can it predict edema? effusion? age? health system? ..."]
 ```
 
-
 ## Step 1: setup
 
 `python scripts/check_setup.py` must end with `Setup looks good.`
@@ -64,7 +63,8 @@ studies = study_table()
 X = load_embeddings(embedding_path("findings"), studies)   # shape (10000, 768)
 ```
 
-
+Save your scripts in the project folder, next to `README.md`, and run them from there,
+otherwise `import src` is not found.
 
 ## Step 3: look at the representation
 
@@ -79,7 +79,6 @@ picture. PCA to 50 dimensions first makes it faster.
 - Colour the points by the edema and pleural effusion labels (clear cases only, the rest
   grey), then by metadata: health system, manufacturer, age, year, report length. Do
   the groups you see follow the diseases, or something else?
-
 
 ## Step 4: measure with linear probes
 
@@ -105,12 +104,11 @@ Result: AUROC for edema and pleural effusion.
 In step 4 the target was a yes/no label. Metadata targets come in three kinds, and the
 kind decides which model and which score you use:
 
-| Kind of target | Example | Model | Score | Chance level |
-|----------------|---------|-------|-------|--------------|
-| yes / no | sex F vs M, age 65 and older | logistic regression | AUROC | 0.5 |
-| several classes | health system (3 classes) | logistic regression | balanced accuracy | 1 / number of classes |
-| a number | age in years, study year | ridge regression | R² |  |
-
+| Kind of target | Example | Model | Patient-wise split | Score | Chance level |
+|----------------|---------|-------|--------------------|-------|--------------|
+| yes / no | sex F vs M, age 65 and older | logistic regression | `StratifiedGroupKFold` | AUROC | 0.5 |
+| several classes | health system (3 classes) | logistic regression | `StratifiedGroupKFold` | balanced accuracy | 1 / number of classes |
+| a number | age in years, study year | ridge regression | `GroupKFold` | R² | 0 |
 
 Choose two or three targets from the study table and probe them the same way as in
 step 4:
@@ -125,8 +123,6 @@ step 4:
 | report length | `findings_words` | number | |
 | sex | `sex` | yes / no (F vs M) | drop the 130 studies with `O` |
 | hospital site | `institution` | classes, harder | keep the 10 most frequent sites: `top_k_classes(studies["institution"], 10)` |
-
-
 
 ## Step 6: interpret
 
