@@ -109,17 +109,15 @@ kind decides which model and which score you use:
 |----------------|---------|-------|-------|--------------|
 | yes / no | sex F vs M, age 65 and older | logistic regression | AUROC | 0.5 |
 | several classes | health system (3 classes) | logistic regression | balanced accuracy | 1 / number of classes |
-| a number | age in years, study year | ridge regression | R² | 0 |
+| a number | age in years, study year | ridge regression | R² |  |
 
-The split stays patient-wise in all three cases: `StratifiedGroupKFold` for the first
-two kinds, `GroupKFold` for numbers.
 
 Choose two or three targets from the study table and probe them the same way as in
 step 4:
 
 | Target | Column | Kind | Before probing |
 |--------|--------|------|----------------|
-| health system | `health_system` | 3 classes | nothing, good first choice |
+| health system | `health_system` | 3 classes |  |
 | scanner manufacturer | `manufacturer` | classes | keep the 6 most frequent brands: `top_k_classes(studies["manufacturer"], 6)` |
 | modality | `modality` | yes / no (CR vs DX) | drop the few studies with other values |
 | age | `age_years` | number, or yes / no (65 and older) | drop studies without age |
@@ -128,9 +126,7 @@ step 4:
 | sex | `sex` | yes / no (F vs M) | drop the 130 studies with `O` |
 | hospital site | `institution` | classes, harder | keep the 10 most frequent sites: `top_k_classes(studies["institution"], 10)` |
 
-Report every score with its chance level and the number of studies it was computed on.
-A probe at 0.55 against a chance of 0.50 has found almost nothing; 0.85 against 0.50
-is a strong signal.
+
 
 ## Step 6: interpret
 
