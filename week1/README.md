@@ -102,22 +102,35 @@ Result: AUROC for edema and pleural effusion.
 
 ## Step 5: what else is in there?
 
-Choose 2 or 3 other targets and probe them the same way:
+In step 4 the target was a yes/no label. Metadata targets come in three kinds, and the
+kind decides which model and which score you use:
 
-| Target | Column | Use as | Rule |
-|--------|--------|--------|------|
-| health system | `health_system` | 3 classes | recommended |
-| scanner manufacturer | `manufacturer` | classes | keep the 6 most frequent, `top_k_classes` |
-| modality | `modality` | CR vs DX | drop the rare others |
-| age | `age_years` | number, or 65 and older | drop missing |
+| Kind of target | Example | Model | Score | Chance level |
+|----------------|---------|-------|-------|--------------|
+| yes / no | sex F vs M, age 65 and older | logistic regression | AUROC | 0.5 |
+| several classes | health system (3 classes) | logistic regression | balanced accuracy | 1 / number of classes |
+| a number | age in years, study year | ridge regression | R² | 0 |
+
+The split stays patient-wise in all three cases: `StratifiedGroupKFold` for the first
+two kinds, `GroupKFold` for numbers.
+
+Choose two or three targets from the study table and probe them the same way as in
+step 4:
+
+| Target | Column | Kind | Before probing |
+|--------|--------|------|----------------|
+| health system | `health_system` | 3 classes | nothing, good first choice |
+| scanner manufacturer | `manufacturer` | classes | keep the 6 most frequent brands: `top_k_classes(studies["manufacturer"], 6)` |
+| modality | `modality` | yes / no (CR vs DX) | drop the few studies with other values |
+| age | `age_years` | number, or yes / no (65 and older) | drop studies without age |
 | study year | `study_year` | number | |
 | report length | `findings_words` | number | |
-| sex | `sex` | F vs M | drop `O` |
-| hospital site | `institution` | classes | harder; keep the 10 most frequent |
+| sex | `sex` | yes / no (F vs M) | drop the 130 studies with `O` |
+| hospital site | `institution` | classes, harder | keep the 10 most frequent sites: `top_k_classes(studies["institution"], 10)` |
 
-Several classes: logistic regression and balanced accuracy. Numbers: ridge regression,
-`GroupKFold`, R². Report every score with its chance level (0.5 for AUROC, 1 divided by
-the number of classes for balanced accuracy, 0 for R²) and the number of studies.
+Report every score with its chance level and the number of studies it was computed on.
+A probe at 0.55 against a chance of 0.50 has found almost nothing; 0.85 against 0.50
+is a strong signal.
 
 ## Step 6: interpret
 
