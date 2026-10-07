@@ -33,8 +33,6 @@ flowchart LR
     P --> Q["can it predict edema? effusion? age? health system? ..."]
 ```
 
-The labels and the metadata are what the probe tries to predict. They are never given
-to the model.
 
 ## Step 1: setup
 
@@ -49,9 +47,9 @@ python scripts/make_embeddings.py
 This runs BioClinicalBERT over the Findings of all 10,000 studies. The model is
 *frozen*: used as downloaded, never trained by us. It gives one vector per word; the
 script averages them (*mean pooling*) into one vector per study and saves the result in
-`data/embeddings/`. A few minutes.
+`data/embeddings/`. 
 
-From here on you write your own scripts. Two helper files exist:
+From here on, you write your own scripts. Two helper files exist:
 
 - `src/data.py`: `study_table()` (one row per study with text, labels and metadata),
   `findings_texts()`, `usable_findings()`, `binary_label(studies, "edema")` (1, 0, or
@@ -66,8 +64,7 @@ studies = study_table()
 X = load_embeddings(embedding_path("findings"), studies)   # shape (10000, 768)
 ```
 
-Save your scripts in the project folder, next to `README.md`, and run them from there;
-otherwise `import src` fails.
+
 
 ## Step 3: look at the representation
 
@@ -83,7 +80,6 @@ picture. PCA to 50 dimensions first makes it faster.
   grey), then by metadata: health system, manufacturer, age, year, report length. Do
   the groups you see follow the diseases, or something else?
 
-Keep one or two pictures.
 
 ## Step 4: measure with linear probes
 
@@ -102,12 +98,11 @@ representation. If it predicts well, the information is present.
   otherwise test words leak into the vocabulary; a `Pipeline` of vectoriser and
   logistic regression fitted inside each fold does this.
 
-Result: AUROC for edema and pleural effusion, both representations, with the number of
-studies.
+Result: AUROC for edema and pleural effusion.
 
 ## Step 5: what else is in there?
 
-Choose two other targets and probe them the same way (show two or three on the poster):
+Choose 2 or 3 other targets and probe them the same way:
 
 | Target | Column | Use as | Rule |
 |--------|--------|--------|------|
@@ -138,9 +133,3 @@ information mean for a model built on this representation?
   give other representations; probe every layer and plot the score per layer.
 - Which words carry the information? Look at the TF-IDF probe weights.
 
-Stay with BioClinicalBERT and TF-IDF; do not bring in other large models.
-
-## For the poster
-
-One or two UMAP pictures, the table of probe scores with chance levels and numbers of
-studies, one figure comparing the two representations, and your interpretation.
